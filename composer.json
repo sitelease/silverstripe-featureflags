@@ -1,5 +1,5 @@
 {
-    "name": "sitelease/featureflags",
+    "name": "sitelease/sl-feature-flags",
     "description": "A module for allowing admin-controlled feature flags in a SilverStripe app",
     "type": "silverstripe-vendormodule",
     "license": "BSD-3-Clause",
