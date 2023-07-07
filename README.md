@@ -3,6 +3,13 @@ Feature Flags
 
 This module is for allowing admin-controlled feature flags in a SilverStripe app. It is a combination of sminnee's `silverstripe-featureflags` module and jacobbuck's `silverstripe-flags` module
 
+Installation
+-----
+
+```sh
+composer require sitelease/sl-feature-flags
+```
+
 Usage
 -----
 
