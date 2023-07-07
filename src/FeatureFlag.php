@@ -117,7 +117,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
      */
     protected function saveContext(Form $form, FieldProvider $fieldProvider)
     {
-        $items = $formData = $fieldProvider->convertFormDataToItems($form->getData());
+        $items = $fieldProvider->convertFormDataToItems($form->getData());
         $key = $fieldProvider->getKey();
 
         // Remove bad items
@@ -175,6 +175,9 @@ class FeatureFlag extends DataObject implements PermissionProvider
     public function requireDefaultRecords()
     {
         $features = FeatureProvider::allFeatures();
+
+        if ($features) {
+        }
 
         foreach ($features as $feature) {
             $alteration = false;

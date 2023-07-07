@@ -8,7 +8,7 @@ namespace Sitelease\FeatureFlags;
  */
 class FeatureFlagChecker implements FeatureFlagCheckable
 {
-    public static function isEnabled($code, $context)
+    public static function isEnabled(string $code, $context): bool
     {
         $feature = FeatureFlag::get()->filter([ 'Code' => $code ])->first();
 

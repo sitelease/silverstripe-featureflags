@@ -6,6 +6,8 @@ use SilverStripe\ORM\DataObject;
 
 class FeatureFlagItem extends DataObject
 {
+    private static $table_name = 'FeatureFlagItem';
+
     private static $db = [
         'ContextKey' => 'Varchar(50)',
         'ContextID' => 'Int',
