@@ -1,10 +1,10 @@
 <?php
 
-namespace SilverStripe\FeatureFlags;
+namespace Sitelease\FeatureFlags;
 
 use SilverStripe\ORM\DataObject;
 
-class FeatureSelectionItem extends DataObject
+class FeatureFlagItem extends DataObject
 {
     private static $db = [
         'ContextKey' => 'Varchar(50)',
@@ -12,6 +12,6 @@ class FeatureSelectionItem extends DataObject
     ];
 
     private static $has_one = [
-        'FeatureSelection' => FeatureSelection::class,
+        'FeatureFlag' => FeatureFlag::class,
     ];
 }

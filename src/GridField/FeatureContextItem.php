@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\FeatureFlags\GridField;
+namespace Sitelease\FeatureFlags\GridField;
 
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 

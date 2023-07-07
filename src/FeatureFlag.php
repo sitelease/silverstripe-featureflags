@@ -1,32 +1,251 @@
 <?php
 
-namespace SilverStripe\FeatureFlags;
+namespace Sitelease\FeatureFlags;
 
-use SilverStripe\Core\Injector\Injector;
+use Sitelease\FeatureFlags\Context\FieldProvider;
+
+use SilverStripe\ORM\DB;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Security\Member;
 use SilverStripe\Core\Config\Config;
 
-/**
- * Class for interacting with the available feature flags
- */
-class FeatureFlag
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionProvider;
+use SilverStripe\Security\Security;
+
+class FeatureFlag extends DataObject implements PermissionProvider
 {
+    private static $table_name = 'FeatureFlag';
 
-    public static function isEnabled($code, $context)
+    private static $db = [
+        'Code' => 'Varchar(50)',
+        'Title' => 'Varchar',
+        'Description' => 'Text',
+        'EnableMode' => 'Enum("Off, On, Partial", "Off")',
+    ];
+
+    private static $indexes = [
+        'Code' => true,
+        'EnableMode' => true,
+    ];
+
+    private static $has_many = [
+        'Items' => FeatureFlagItem::class,
+    ];
+
+    private static $summary_fields = [
+        'Title',
+        'Description',
+        'EnableMode',
+    ];
+
+    private static $searchable_fields = [
+        'Title',
+        'Code',
+        'Description',
+        'EnableMode',
+    ];
+
+    private static $default_sort = '"Title" ASC';
+
+    public function canCreate($member = null, $context = [])
     {
-        return Injector::inst()->get(FeatureFlagChecker::class)->isEnabled($code, $context);
+        return false;
     }
 
-    public static function allFeatures()
+    public function canEdit($member = null)
     {
-        return (array)Config::inst()->get(self::class, 'features');
+        return Permission::check('EDIT_FEATURE_FLAGS', 'any', $member);
     }
 
-    public static function getFeature($code)
+    public function canDelete($member = null)
     {
-        foreach(self::allFeatures() as $feature) {
-            if($feature['code'] == $code) {
-                return $feature;
+        return false;
+    }
+
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->addFieldToTab('Root.Main', new ReadonlyField('Code'), 'EnableMode');
+        $fields->removeFieldFromTab('Root', 'Items');
+
+        $fieldProviders = $this->getFieldProviders();
+        foreach ($fieldProviders as $fieldProvider) {
+            $this->addContextFields($fields, $fieldProvider);
+        }
+
+        // If there are no context field providers, Partial mode is not allowed
+        if (!$fieldProviders) {
+            $fields->dataFieldByName('EnableMode')->setSource([
+                'On' => 'On',
+                'Off' => 'Off',
+            ]);
+        }
+
+        return $fields;
+    }
+
+    public function saveContextFromForm(Form $form)
+    {
+        foreach ($this->getFieldProviders() as $fieldProvider) {
+            $this->saveContext($form, $fieldProvider);
+        }
+    }
+
+    /**
+     * Add fields for the given context key, using the field provider for the given class
+     */
+    protected function addContextFields(FieldList $fields, FieldProvider $fieldProvider)
+    {
+
+        foreach ($fieldProvider->getCMSFields() as $field) {
+            $fields->addFieldToTab('Root.Main', $field);
+        }
+
+        $ids = $this->Items()->filter([ 'ContextKey' => $fieldProvider->getKey() ])->column('ContextID');
+        $formData = $fieldProvider->convertItemsToFormData($ids);
+        $fields->setValues($formData);
+    }
+
+    /**
+     * Add fields for the given field provider
+     */
+    protected function saveContext(Form $form, FieldProvider $fieldProvider)
+    {
+        $items = $formData = $fieldProvider->convertFormDataToItems($form->getData());
+        $key = $fieldProvider->getKey();
+
+        // Remove bad items
+        $badItems = $this->Items()->filter([ 'ContextKey' => $key ]);
+        if ($items) {
+            $badItems = $badItems->filter([ 'ContextID:not' => $items ]);
+        }
+
+        foreach ($badItems as $item) {
+            $item->delete();
+        }
+
+        if ($items) {
+            // Itentify existing items to neither add nor delete
+            $existingItems = $this->Items()
+                ->filter([ 'ContextKey' => $key, 'ContextID' => $items ])
+                ->column('ContextID');
+
+            // Add new items
+            foreach (array_diff($items, $existingItems) as $itemID) {
+                $item = new FeatureFlagItem();
+                $item->ContextKey = $key;
+                $item->ContextID = $itemID;
+                $this->Items()->add($item);
             }
         }
+    }
+
+    /**
+     * Return the FieldProvider instances for selecting the context of this feature flag
+     */
+    protected function getFieldProviders()
+    {
+        $feature = FeatureProvider::getFeature($this->Code);
+        if (empty($feature['context'])) {
+            return [];
+        }
+
+        $fieldProviderMap = Config::inst()->get(FeatureFlagAdmin::class, 'context_field_providers');
+        $fieldProviders = [];
+
+        foreach ($feature['context'] as $key => $className) {
+            if (empty($fieldProviderMap[$className])) {
+                throw new \LogicException('Can\'t find context field provider for ' . $className);
+            }
+            $fieldProviderClass = $fieldProviderMap[$className];
+            $fieldProvider = new $fieldProviderClass();
+            $fieldProvider->setKey($key);
+            $fieldProviders[] = $fieldProvider;
+        }
+
+        return $fieldProviders;
+    }
+
+    public function requireDefaultRecords()
+    {
+        $features = FeatureProvider::allFeatures();
+
+        foreach ($features as $feature) {
+            $alteration = false;
+            $record = self::get()->filter('Code', $feature['Code'])->first();
+
+            if (!$record) {
+                $alteration = 'created';
+                $record = new FeatureFlag();
+                $record->Code = $feature['Code'];
+                $record->Title = $feature['Title'];
+                $record->Description = $feature['Description'];
+                $record->EnableMode = $feature['Enabled'];
+            } else {
+                if (
+                    array_key_exists('Description', $feature)
+                    && $record->Description != $feature['Description']
+                ) {
+                    $alteration = 'changed';
+                    $record->Description = $feature['Description'];
+                }
+                if (
+                    array_key_exists('Title', $feature)
+                    && $record->Description != $feature['Title']
+                ) {
+                    $alteration = 'changed';
+                    $record->Title = $feature['Title'];
+                }
+            }
+
+            if ($alteration) {
+                $record->write();
+                DB::alteration_message("Feature '$feature[Code]' $alteration", $alteration);
+            }
+        }
+
+        $featuresNames = array_map(
+            function ($feature) {
+                return $feature['Code'];
+            },
+            $features
+        );
+
+        $flagsToDelete = self::get()->exclude('Code', $featuresNames);
+
+        foreach ($flagsToDelete as $feature) {
+            $feature->delete();
+            DB::alteration_message("Flag '$feature->Code' deleted", 'deleted');
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function onAfterWrite()
+    {
+        parent::onAfterWrite();
+
+        $historyRecord = new FeatureFlagHistory();
+        $historyRecord->EnableMode = $this->EnableMode;
+        $historyRecord->AuthorID = Security::getCurrentUser();
+        $historyRecord->FeatureFlagID = $this->ID;
+        $historyRecord->write();
+    }
+
+    public function providePermissions()
+    {
+        return [
+            'EDIT_FEATURE_FLAGS' => [
+                'name' => 'Modify Feature Flags',
+                'category' => 'Feature Flags',
+            ],
+        ];
     }
 }

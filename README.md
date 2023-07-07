@@ -14,15 +14,14 @@ Releases
 Usage
 -----
 
-If your application code, use `SilverStripe\FeatureFlags\FeatureFlag::isEnabled` to determine if a flag
-is set.
+In your application code, use `Sitelease\FeatureFlags\FeatureProvider::isFeatureEnabled` to determine if a flag is set.
 
 ### Making code feature-dependent
 
 ```php
-use SilverStripe\FeatureFlags\FeatureFlag;
+use Sitelease\FeatureFlags\FeatureProvider;
 // ...
-if(FeatureFlag::isEnabled('FEATURE_NAME', [ "Member" => Member::currentUser() ])) {
+if(FeatureProvider::isFeatureEnabled('FEATURE_NAME', [ "Member" => Member::currentUser() ])) {
     $controller->SomeSetting = "some value";
 }
 ```
@@ -46,26 +45,30 @@ for controlling feature flags will provid different tools for selecting features
 
 ### Definining new features
 
-To define new features, add new items to the array `SilverStripe\FeatureFlags\FeatureFlag.feature` in your
+To define new features, add new items to the array `Sitelease\FeatureFlags\FeatureProvider.features` in your
 config:
 
 ```yml
-SilverStripe\FeatureFlags\FeatureFlag:
+Sitelease\FeatureFlags\FeatureProvider:
   features:
     - code: FEATURE_NAME
       title: My feature 
+      description: A description of what this feature does and how it affects fields, features, interfaces, etc.
       context:
         Member: Member
+      enabled: "Off"
 ```
 
 Each feature have the following options:
 
- * **code:** This is the codename passed as the first argument to FeatureFlag::isEnabled(). By convention, we
+ * **code:** This is the codename passed as the first argument to FeatureProvider::isFeatureEnabled(). By convention, we
    recommend UPPER_SNAKE_CASE for these.
  * **title:** This is a title shown in the feature flag admin
+ * **description:** (optional) A longer description of what this feature does and affects. This will be displayed in the flags admin
  * **context:** This is a map of the required context values. The keys are the context keys, and the values are
    the class or interface that the value passed must derive from. Scalar context is not allowed. Any context values
-   specified here that are not passed to `FeatureFlag::isEnabled()` will result in an error.
+   specified here that are not passed to `FeatureProvider::isFeatureEnabled()` will result in an error.
+* **enabled:** The initial value of this flag when it's created, after which it can be changed via the interface. Can be one of three values: "Off", "On", or "Partial" (defaults to "Off" if not set)
 
 ### Feature admin
 
@@ -78,20 +81,20 @@ feature and gives you some form controls for choosing which context values will 
 
 For each data type in the context, you will need to have a form control for editing it. These are provided by
 "context field providers".By default, we provide a simple context field provider for `SilverStripe\Security\Member`.
-This is defined in the class `SilverStripe\FeatureFlags\Context\MemberFieldProvider`.
+This is defined in the class `Sitelease\FeatureFlags\Context\MemberFieldProvider`.
 
 If you are making feature flags dependent on your own data objects, you will probably want to add your own field
 provders. There are two steps necessary to do this:
 
- * Define a class that implements `SilverStripe\FeatureFlags\Context\FieldProvider`.
+ * Define a class that implements `Sitelease\FeatureFlags\Context\FieldProvider`.
  * Attach that class to the FeatureFlagAdmin by adding an entry to the `context_field_providers` config setting.
 
 The config setting looks like this:
 
 ```
-SilverStripe\FeatureFlags\FeatureFlagAdmin:
+Sitelease\FeatureFlags\FeatureFlagAdmin:
   context_field_providers:
-    SilverStripe\Security\Member: SilverStripe\FeatureFlags\Context\Member 
+    SilverStripe\Security\Member: Sitelease\FeatureFlags\Context\Member 
 ```
 
  * The key should be the context class that you wish to use the field provider with

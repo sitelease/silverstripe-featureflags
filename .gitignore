@@ -1,0 +1,30 @@
+# ignore cache folder
+/silverstripe-cache/
+
+# ignore .env file
+/.env
+
+# ignore build tools
+/tools/phing-metadata
+
+# ignore composer vendor folder
+/vendor/
+
+# ignore default modules from composer
+.DS_Store
+/public/assets/
+/public/resources/
+/public/_resources/
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files and folders
+.idea/
+.vscode/
+_pgbackup/

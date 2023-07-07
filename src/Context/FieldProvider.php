@@ -1,13 +1,12 @@
 <?php
 
-namespace SilverStripe\FeatureFlags\Context;
+namespace Sitelease\FeatureFlags\Context;
 
 /**
  * Interface for new context UIs
  */
 interface FieldProvider
 {
-
     public function getKey();
 
     public function setKey($key);

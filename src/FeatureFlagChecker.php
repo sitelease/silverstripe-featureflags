@@ -1,17 +1,16 @@
 <?php
 
-namespace SilverStripe\FeatureFlags;
+namespace Sitelease\FeatureFlags;
 
 /**
  * Default implementation fo FeatureFlagCheckable.
- * Uses the FeatureSelection / FeatureSelectionItem data objects
+ * Uses the FeatureFlag / FeatureFlagItem data objects
  */
 class FeatureFlagChecker implements FeatureFlagCheckable
 {
-
     public static function isEnabled($code, $context)
     {
-        $feature = FeatureSelection::get()->filter([ 'Code' => $code ])->first();
+        $feature = FeatureFlag::get()->filter([ 'Code' => $code ])->first();
 
         // Simple modes
         if ($feature->EnableMode === 'On') {

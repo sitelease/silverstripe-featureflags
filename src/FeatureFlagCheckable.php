@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\FeatureFlags;
+namespace Sitelease\FeatureFlags;
 
 /**
  * Interface defining a provider for feature flag checks

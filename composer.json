@@ -1,16 +1,26 @@
 {
-    "name": "silverstripe/featureflags",
-    "description": "An experimental module for allowing admin-controlled feature flags in a SilverStripe app",
+    "name": "sitelease/featureflags",
+    "description": "A module for allowing admin-controlled feature flags in a SilverStripe app",
     "type": "silverstripe-vendormodule",
     "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Sam Minnee",
             "email": "sam@silverstripe.com"
+        },
+        {
+            "name": "Jim Blake",
+            "homepage": "http://www.sitelease.ca",
+            "role": "Teamleader"
+        },
+        {
+            "name": "Benjamin Blake",
+            "homepage": "http://www.sitelease.ca",
+            "role": "Developer"
         }
     ],
     "require": {
-      "silverstripe/framework": "^4.0.0-alpha6"
+      "silverstripe/framework": "^4"
     },
     "extra": {
       "branch-alias": {
@@ -19,7 +29,7 @@
     },
     "autoload": {
       "psr-4": {
-        "SilverStripe\\FeatureFlags\\": "src/"
+        "Sitelease\\FeatureFlags\\": "src/"
       }
     }
 }

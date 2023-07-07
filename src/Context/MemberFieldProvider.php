@@ -1,17 +1,13 @@
 <?php
 
-namespace SilverStripe\FeatureFlags\Context;
+namespace Sitelease\FeatureFlags\Context;
 
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
-use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Member as MemberData;
 
 class MemberFieldProvider implements FieldProvider
 {
-
     private $key;
 
     public function setKey($key)

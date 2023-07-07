@@ -1,6 +1,6 @@
 ---
 name: featureflags
 ---
-SilverStripe\FeatureFlags\FeatureFlagAdmin:
+Sitelease\FeatureFlags\FeatureFlagAdmin:
   context_field_providers:
-    SilverStripe\Security\Member: SilverStripe\FeatureFlags\Context\MemberFieldProvider
+    SilverStripe\Security\Member: Sitelease\FeatureFlags\Context\MemberFieldProvider
