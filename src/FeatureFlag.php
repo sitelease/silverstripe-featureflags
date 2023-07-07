@@ -175,56 +175,54 @@ class FeatureFlag extends DataObject implements PermissionProvider
     public function requireDefaultRecords()
     {
         $features = FeatureProvider::allFeatures();
+        if (!empty($features)) {
+            foreach ($features as $feature) {
+                $alteration = false;
+                $record = self::get()->filter('Code', $feature['Code'])->first();
 
-        if ($features) {
-        }
-
-        foreach ($features as $feature) {
-            $alteration = false;
-            $record = self::get()->filter('Code', $feature['Code'])->first();
-
-            if (!$record) {
-                $alteration = 'created';
-                $record = new FeatureFlag();
-                $record->Code = $feature['Code'];
-                $record->Title = $feature['Title'];
-                $record->Description = $feature['Description'];
-                $record->EnableMode = $feature['Enabled'];
-            } else {
-                if (
-                    array_key_exists('Description', $feature)
-                    && $record->Description != $feature['Description']
-                ) {
-                    $alteration = 'changed';
-                    $record->Description = $feature['Description'];
-                }
-                if (
-                    array_key_exists('Title', $feature)
-                    && $record->Description != $feature['Title']
-                ) {
-                    $alteration = 'changed';
+                if (!$record) {
+                    $alteration = 'created';
+                    $record = new FeatureFlag();
+                    $record->Code = $feature['Code'];
                     $record->Title = $feature['Title'];
+                    $record->Description = $feature['Description'];
+                    $record->EnableMode = $feature['Enabled'];
+                } else {
+                    if (
+                        array_key_exists('Description', $feature)
+                        && $record->Description != $feature['Description']
+                    ) {
+                        $alteration = 'changed';
+                        $record->Description = $feature['Description'];
+                    }
+                    if (
+                        array_key_exists('Title', $feature)
+                        && $record->Description != $feature['Title']
+                    ) {
+                        $alteration = 'changed';
+                        $record->Title = $feature['Title'];
+                    }
+                }
+
+                if ($alteration) {
+                    $record->write();
+                    DB::alteration_message("Feature '$feature[Code]' $alteration", $alteration);
                 }
             }
 
-            if ($alteration) {
-                $record->write();
-                DB::alteration_message("Feature '$feature[Code]' $alteration", $alteration);
+            $featuresNames = array_map(
+                function ($feature) {
+                    return $feature['Code'];
+                },
+                $features
+            );
+
+            $flagsToDelete = self::get()->exclude('Code', $featuresNames);
+
+            foreach ($flagsToDelete as $feature) {
+                $feature->delete();
+                DB::alteration_message("Flag '$feature->Code' deleted", 'deleted');
             }
-        }
-
-        $featuresNames = array_map(
-            function ($feature) {
-                return $feature['Code'];
-            },
-            $features
-        );
-
-        $flagsToDelete = self::get()->exclude('Code', $featuresNames);
-
-        foreach ($flagsToDelete as $feature) {
-            $feature->delete();
-            DB::alteration_message("Flag '$feature->Code' deleted", 'deleted');
         }
     }
 
