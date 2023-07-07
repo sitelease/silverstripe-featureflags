@@ -34,7 +34,7 @@ class FeatureFlagHistory extends DataObject
      * @var array
      */
     private static $searchable_fields = [
-        'Enabled',
+        'EnableMode',
         'LastEdited',
     ];
 
@@ -42,7 +42,7 @@ class FeatureFlagHistory extends DataObject
      * @var array
      */
     private static $summary_fields = [
-        'Enabled' => 'Enabled',
+        'EnableMode' => 'Enabled',
         'LastEdited' => 'Last edited',
         'Author.Name' => 'Author name',
     ];
