@@ -1,15 +1,7 @@
 Feature Flags
 =============
 
-This experimental module is for allowing admin-controlled feature flags in a SilverStripe app.
-
-Releases
---------
-
-
- * `silverstripe/featureflags:~0.1.0`: compatible with SilverStripe 3. `0.1` branch in git.
- * `silverstripe/featureflags:~0.2.0`: compatible with SilverStripe 4. `master` branch in git.
-
+This module is for allowing admin-controlled feature flags in a SilverStripe app. It is a combination of sminnee's `silverstripe-featureflags` module and jacobbuck's `silverstripe-flags` module
 
 Usage
 -----
