@@ -233,6 +233,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
     {
         parent::onAfterWrite();
         $member = Security::getCurrentUser();
+
         $historyRecord = FeatureFlagHistory::create();
         $historyRecord->EnableMode = $this->EnableMode;
         $historyRecord->AuthorID = $member->ID;

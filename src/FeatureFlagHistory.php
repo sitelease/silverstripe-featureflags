@@ -27,7 +27,7 @@ class FeatureFlagHistory extends DataObject
      */
     private static $has_one = [
         'Author' => Member::class,
-        'Flag' => FeatureFlag::class,
+        'FeatureFlag' => FeatureFlag::class,
     ];
 
     /**
@@ -43,7 +43,8 @@ class FeatureFlagHistory extends DataObject
      */
     private static $summary_fields = [
         'EnableMode' => 'Enabled',
-        'LastEdited' => 'Last edited',
+        'Flag.Title' => 'Enabled',
+        'LastEdited.Nice' => 'Last edited',
         'Author.Name' => 'Author name',
     ];
 
