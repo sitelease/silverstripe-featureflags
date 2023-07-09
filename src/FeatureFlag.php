@@ -8,14 +8,12 @@ use SilverStripe\ORM\DB;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\Forms\CheckboxSetField;
-use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 use SilverStripe\Core\Config\Config;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
-use SilverStripe\Security\Security;
 
 class FeatureFlag extends DataObject implements PermissionProvider
 {
@@ -234,10 +232,10 @@ class FeatureFlag extends DataObject implements PermissionProvider
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-
-        $historyRecord = new FeatureFlagHistory();
+        $member = Security::getCurrentUser();
+        $historyRecord = FeatureFlagHistory::create();
         $historyRecord->EnableMode = $this->EnableMode;
-        $historyRecord->AuthorID = Security::getCurrentUser();
+        $historyRecord->AuthorID = $member->ID;
         $historyRecord->FeatureFlagID = $this->ID;
         $historyRecord->write();
     }
