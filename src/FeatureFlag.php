@@ -178,41 +178,43 @@ class FeatureFlag extends DataObject implements PermissionProvider
         if (!empty($features)) {
             foreach ($features as $feature) {
                 $alteration = false;
-                $record = self::get()->filter('Code', $feature['Code'])->first();
+                $record = self::get()->filter('Code', $feature['code'])->first();
 
                 if (!$record) {
                     $alteration = 'created';
                     $record = new FeatureFlag();
-                    $record->Code = $feature['Code'];
-                    $record->Title = $feature['Title'];
-                    $record->Description = $feature['Description'];
-                    $record->EnableMode = $feature['Enabled'];
+                    $record->Code = $feature['code'];
+                    $record->Title = $feature['title'];
+                    if (isset($feature['description'])) {
+                        $record->Description = $feature['description'];
+                    }
+                    $record->EnableMode = $feature['enabled'];
                 } else {
                     if (
-                        array_key_exists('Description', $feature)
-                        && $record->Description != $feature['Description']
+                        array_key_exists('description', $feature)
+                        && $record->Description != $feature['description']
                     ) {
                         $alteration = 'changed';
-                        $record->Description = $feature['Description'];
+                        $record->Description = $feature['description'];
                     }
                     if (
-                        array_key_exists('Title', $feature)
-                        && $record->Description != $feature['Title']
+                        array_key_exists('title', $feature)
+                        && $record->Description != $feature['title']
                     ) {
                         $alteration = 'changed';
-                        $record->Title = $feature['Title'];
+                        $record->Title = $feature['title'];
                     }
                 }
 
                 if ($alteration) {
                     $record->write();
-                    DB::alteration_message("Feature '$feature[Code]' $alteration", $alteration);
+                    DB::alteration_message("Feature '$feature[code]' $alteration", $alteration);
                 }
             }
 
             $featuresNames = array_map(
                 function ($feature) {
-                    return $feature['Code'];
+                    return $feature['code'];
                 },
                 $features
             );

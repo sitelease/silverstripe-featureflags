@@ -50,7 +50,8 @@ config:
 ```yml
 Sitelease\FeatureFlags\FeatureProvider:
   features:
-    - code: FEATURE_NAME
+    - 
+      code: FEATURE_NAME
       title: My feature 
       description: A description of what this feature does and how it affects fields, features, interfaces, etc.
       context:
