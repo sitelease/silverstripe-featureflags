@@ -43,7 +43,7 @@ class FeatureFlagHistory extends DataObject
      */
     private static $summary_fields = [
         'EnableMode' => 'Enabled',
-        'Flag.Title' => 'Enabled',
+        'FeatureFlag.Title' => 'Enabled',
         'LastEdited.Nice' => 'Last edited',
         'Author.Name' => 'Author name',
     ];
@@ -82,6 +82,6 @@ class FeatureFlagHistory extends DataObject
      */
     public function canView($member = null)
     {
-        return $this->Flag()->canView($member);
+        return $this->FeatureFlag()->canView($member);
     }
 }
