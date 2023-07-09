@@ -43,7 +43,7 @@ class FeatureFlagHistory extends DataObject
      */
     private static $summary_fields = [
         'EnableMode' => 'Enabled',
-        'FeatureFlag.Title' => 'Enabled',
+        'FeatureFlag.Title' => 'Feature Title',
         'LastEdited.Nice' => 'Last edited',
         'Author.Name' => 'Author name',
     ];

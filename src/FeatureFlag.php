@@ -197,7 +197,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
                     }
                     if (
                         array_key_exists('title', $feature)
-                        && $record->Description != $feature['title']
+                        && $record->Title != $feature['title']
                     ) {
                         $alteration = 'changed';
                         $record->Title = $feature['title'];
