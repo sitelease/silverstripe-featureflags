@@ -22,6 +22,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
     private static $db = [
         'Code' => 'Varchar(50)',
         'Title' => 'Varchar',
+        'Status' => 'Varchar',
         'Description' => 'Text',
         'EnableMode' => 'Enum("Off, On, Partial", "Off")',
     ];
@@ -37,6 +38,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
 
     private static $summary_fields = [
         'Title',
+        'Status',
         'Description',
         'EnableMode',
     ];
@@ -44,6 +46,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
     private static $searchable_fields = [
         'Title',
         'Code',
+        'Status',
         'Description',
         'EnableMode',
     ];
@@ -182,6 +185,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
                     $alteration = 'created';
                     $record = new FeatureFlag();
                     $record->Code = $feature['code'];
+                    $record->Status = $feature['status'];
                     $record->Title = $feature['title'];
                     if (isset($feature['description'])) {
                         $record->Description = $feature['description'];
@@ -194,6 +198,13 @@ class FeatureFlag extends DataObject implements PermissionProvider
                     ) {
                         $alteration = 'changed';
                         $record->Description = $feature['description'];
+                    }
+                    if (
+                        array_key_exists('status', $feature)
+                        && $record->Status != $feature['status']
+                    ) {
+                        $alteration = 'changed';
+                        $record->Status = $feature['status'];
                     }
                     if (
                         array_key_exists('title', $feature)
