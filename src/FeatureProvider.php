@@ -12,7 +12,7 @@ use SilverStripe\View\TemplateGlobalProvider;
  */
 class FeatureProvider implements TemplateGlobalProvider
 {
-    public static function isFeatureEnabled(string $code, $context): bool
+    public static function isFeatureEnabled(string $code, $context = null): bool
     {
         return Injector::inst()->get(FeatureFlagChecker::class)->isEnabled($code, $context);
     }

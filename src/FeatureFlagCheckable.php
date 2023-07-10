@@ -7,5 +7,5 @@ namespace Sitelease\FeatureFlags;
  */
 interface FeatureFlagCheckable
 {
-    public static function isEnabled(string $code, $context): bool;
+    public static function isEnabled(string $code, $context = null): bool;
 }
