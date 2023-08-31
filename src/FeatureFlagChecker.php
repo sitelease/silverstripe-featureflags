@@ -12,26 +12,28 @@ class FeatureFlagChecker implements FeatureFlagCheckable
     {
         $feature = FeatureFlag::get()->filter([ 'Code' => $code ])->first();
 
-        // Simple modes
-        if ($feature->EnableMode === 'On') {
-            return true;
-        }
-        if ($feature->EnableMode === 'Off') {
-            return false;
-        }
+        if ($feature) {
+            // Simple modes
+            if ($feature->EnableMode === 'On') {
+                return true;
+            }
+            if ($feature->EnableMode === 'Off') {
+                return false;
+            }
 
-        // TODO: validate context
-        if (isset($context)) {
-            // Check each context value against the selections
-            foreach ($context as $key => $obj) {
-                $contextTest = $feature->Items()->filter([
-                    'ContextKey' => $key,
-                    'ContextID' => $obj ? $obj->ID : 0,
-                ]);
+            // TODO: validate context
+            if (isset($context)) {
+                // Check each context value against the selections
+                foreach ($context as $key => $obj) {
+                    $contextTest = $feature->Items()->filter([
+                        'ContextKey' => $key,
+                        'ContextID' => $obj ? $obj->ID : 0,
+                    ]);
 
-                // Any context match will result in the feature being enabled
-                if ($contextTest->count() > 0) {
-                    return true;
+                    // Any context match will result in the feature being enabled
+                    if ($contextTest->count() > 0) {
+                        return true;
+                    }
                 }
             }
         }
