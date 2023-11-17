@@ -132,7 +132,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
         }
 
         if ($items) {
-            // Itentify existing items to neither add nor delete
+            // Identify existing items to neither add nor delete
             $existingItems = $this->Items()
                 ->filter([ 'ContextKey' => $key, 'ContextID' => $items ])
                 ->column('ContextID');
