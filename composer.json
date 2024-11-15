@@ -22,11 +22,7 @@
     "require": {
       "sitelease/sl-open-core": "^5.3"
     },
-    "extra": {
-      "branch-alias": {
-        "dev-master": "0.2.x-dev"
-      }
-    },
+    "extra": {},
     "autoload": {
       "psr-4": {
         "Sitelease\\FeatureFlags\\": "src/"

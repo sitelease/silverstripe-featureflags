@@ -132,7 +132,7 @@ class FeatureFlag extends DataObject implements PermissionProvider
         }
 
         if ($items) {
-            // Itentify existing items to neither add nor delete
+            // Identify existing items to neither add nor delete
             $existingItems = $this->Items()
                 ->filter([ 'ContextKey' => $key, 'ContextID' => $items ])
                 ->column('ContextID');
@@ -244,12 +244,13 @@ class FeatureFlag extends DataObject implements PermissionProvider
     {
         parent::onAfterWrite();
         $member = Security::getCurrentUser();
-
-        $historyRecord = FeatureFlagHistory::create();
-        $historyRecord->EnableMode = $this->EnableMode;
-        $historyRecord->AuthorID = $member->ID;
-        $historyRecord->FeatureFlagID = $this->ID;
-        $historyRecord->write();
+        if ($member) {
+            $historyRecord = FeatureFlagHistory::create();
+            $historyRecord->EnableMode = $this->EnableMode;
+            $historyRecord->AuthorID = $member->ID;
+            $historyRecord->FeatureFlagID = $this->ID;
+            $historyRecord->write();
+        }
     }
 
     public function providePermissions()
