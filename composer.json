@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-      "silverstripe/framework": "^4"
+      "sitelease/sl-open-core": "^5.3"
     },
     "extra": {
       "branch-alias": {
