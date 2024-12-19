@@ -21,7 +21,6 @@ class FeatureFlagChecker implements FeatureFlagCheckable
     {
         $cache = self::$featureRecordCache;
         if (empty($cache)) {
-            print("Cache called");
             $cache = FeatureFlag::get()->map('Code', 'EnableMode')->toArray();
             self::$featureRecordCache = $cache;
         }
